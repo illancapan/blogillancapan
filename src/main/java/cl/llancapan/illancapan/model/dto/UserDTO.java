@@ -1,9 +1,6 @@
 package cl.llancapan.illancapan.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -20,5 +17,6 @@ public class UserDTO {
     private String email;
     private String avatarUrl;
     private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
 }

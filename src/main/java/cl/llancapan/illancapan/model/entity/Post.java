@@ -1,12 +1,16 @@
 package cl.llancapan.illancapan.model.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
+@Setter
 public class Post {
 
     @Id
@@ -19,8 +23,8 @@ public class Post {
     private String content;
     private String imageUrl;
 
-    private LocalDateTime updatedAt;
     private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();

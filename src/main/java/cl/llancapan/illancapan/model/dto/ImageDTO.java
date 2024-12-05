@@ -10,11 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImageDTO {
-
     private Long id;
-
     private String url;
     private String altText;
-
     private PostDTO post;
 }
