@@ -6,9 +6,11 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Entity
+
 @Getter
 @Setter
+@Entity
+@Table(name = "comment")
 public class Comment {
 
     @Id
@@ -20,7 +22,7 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User author;
+    private Users author;
 
     @ManyToOne
     @JoinColumn(name ="post_id")

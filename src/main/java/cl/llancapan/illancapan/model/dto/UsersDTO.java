@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
+public class UsersDTO {
 
     private Long id;
 

@@ -1,40 +1,40 @@
 package cl.llancapan.illancapan.util;
 
-import cl.llancapan.illancapan.model.dto.UserDTO;
-import cl.llancapan.illancapan.model.entity.User;
+import cl.llancapan.illancapan.model.dto.UsersDTO;
+import cl.llancapan.illancapan.model.entity.Users;
 
 public class MapperUtil {
 
-    public static UserDTO toUserDTO(User user) {
-        if (user == null) {
+    public static UsersDTO toUserDTO(Users users) {
+        if (users == null) {
             return null;
         }
 
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(user.getId());
-        userDTO.setGithubId(user.getGithubId());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setUsername(user.getUsername());
-        userDTO.setAvatarUrl(user.getAvatarUrl());
-        userDTO.setCreatedAt(user.getCreatedAt());
-        userDTO.setUpdatedAt(user.getUpdatedAt());
+        UsersDTO usersDTO = new UsersDTO();
+        usersDTO.setId(users.getId());
+        usersDTO.setGithubId(users.getGithubId());
+        usersDTO.setEmail(users.getEmail());
+        usersDTO.setUsername(users.getUsername());
+        usersDTO.setAvatarUrl(users.getAvatarUrl());
+        usersDTO.setCreatedAt(users.getCreatedAt());
+        usersDTO.setUpdatedAt(users.getUpdatedAt());
 
-        return userDTO;
+        return usersDTO;
     }
-    public static User toUser(UserDTO userDTO) {
-        if (userDTO == null) {
+    public static Users toUser(UsersDTO usersDTO) {
+        if (usersDTO == null) {
             return null;
         }
 
-        User user = new User();
-        user.setId(userDTO.getId());
-        user.setGithubId(userDTO.getGithubId());
-        user.setEmail(userDTO.getEmail());
-        user.setUsername(userDTO.getUsername());
-        user.setAvatarUrl(userDTO.getAvatarUrl());
-        user.setCreatedAt(userDTO.getCreatedAt());
-        user.setUpdatedAt(userDTO.getUpdatedAt());
+        Users users = new Users();
+        users.setId(usersDTO.getId());
+        users.setGithubId(usersDTO.getGithubId());
+        users.setEmail(usersDTO.getEmail());
+        users.setUsername(usersDTO.getUsername());
+        users.setAvatarUrl(usersDTO.getAvatarUrl());
+        users.setCreatedAt(usersDTO.getCreatedAt());
+        users.setUpdatedAt(usersDTO.getUpdatedAt());
 
-        return user;
+        return users;
     }
 }
