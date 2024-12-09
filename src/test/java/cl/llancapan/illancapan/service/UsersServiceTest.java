@@ -3,6 +3,7 @@ package cl.llancapan.illancapan.service;
 import cl.llancapan.illancapan.model.dto.UsersDTO;
 import cl.llancapan.illancapan.model.entity.Users;
 import cl.llancapan.illancapan.repository.UsersRepository;
+import org.apache.catalina.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,12 +12,21 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UsersServiceTest {
@@ -29,80 +39,123 @@ class UsersServiceTest {
     @InjectMocks
     private UsersService usersService; // El servicio a probar
 
-    private Users users;  // Objeto de entidad que usaremos en las pruebas
-    private UsersDTO usersDTO; // DTO correspondiente
+    private MockMvc mockMvc;
+
+//    private Users users;  // Objeto de entidad que usaremos en las pruebas
+
+    private Users user1;
+    private Users user2;
+    private List<Users> usersListEntities; // Usamos entidades Users
+
+    private UsersDTO user1DTO;
+    private UsersDTO user2DTO;
+    private List<UsersDTO> usersListDTO;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Crear una entidad User con todos los atributos necesarios
-        users = new Users(1L, "github-id", "username", "email@email.com", "avatar-url", LocalDateTime.now(), LocalDateTime.now());
+        user1 = new Users(
+                1L,
+                "github-id",
+                "username",
+                "email@email.com",
+                "avatar-url",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
-        // Crear un UserDTO para comparación
-        usersDTO = new UsersDTO(1L, "github-id", "username", "email@email.com", "avatar-url", LocalDateTime.now(), LocalDateTime.now());
+        user2 = new Users(
+                2L,
+                "github-id",
+                "username",
+                "email@email.com",
+                "avatar-url",
+                LocalDateTime.now(),
+                LocalDateTime.now());
+
+        usersListEntities = Arrays.asList(user1, user2);
+
+        user1DTO = new UsersDTO(
+                1L,
+                "github-id-1",
+                "username1",
+                "email1@email.com",
+                "avatar-url-1",
+                LocalDateTime.now(),
+                LocalDateTime.now());
+
+        user2DTO = new UsersDTO(
+                2L,
+                "github-id-2",
+                "username2",
+                "email2@email.com",
+                "avatar-url-2",
+                LocalDateTime.now(),
+                LocalDateTime.now());
+
+        usersListDTO = Arrays.asList(user1DTO, user2DTO);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(usersService).build();
+
+        when(usersRepository.findAll()).thenReturn(usersListEntities);
+
+        when(modelMapper.map(user1, UsersDTO.class)).thenReturn(user1DTO);
+        when(modelMapper.map(user2, UsersDTO.class)).thenReturn(user2DTO);
     }
 
     @Test
-    void testGetUser() {
-        when(usersRepository.findById(1L)).thenReturn(java.util.Optional.of(users));
+    void testGetAllUser_shouldGetAllUsers() {
+        List<UsersDTO> result = usersService.getUserAll();
 
-        when(modelMapper.map(users, UsersDTO.class)).thenReturn(usersDTO);
+        assertNotNull(result, "El resultado no debe ser nulo");
+        assertEquals(2, result.size(), "El numero de usuairios obtenidos no es el esperado ");
+        assertEquals(user1DTO.getEmail(), result.get(0).getEmail(), "El email del primer usuario no coincide");
+        assertEquals(user2DTO.getEmail(), result.get(1).getEmail(), "El email del segundo usuario no coincide");
 
-        UsersDTO result = usersService.getUser(1L);
-
-        assertNotNull(result, "El resultado no debe ser nulo, el servicio no debe devolver un UserDTO nulo");
-        assertEquals(usersDTO.getEmail(), result.getEmail(), "El email del resultado no coincide con el esperado");
-        assertEquals(usersDTO.getUsername(), result.getUsername(), "El nombre de usuario del resultado no coincide con el esperado");
-
-        verify(usersRepository, times(1)).findById(1L);
-        verify(modelMapper, times(1)).map(users, UsersDTO.class);
+        verify(usersRepository, times(1)).findAll();
+        verify(modelMapper, times(1)).map(user1, UsersDTO.class);
+        verify(modelMapper, times(1)).map(user2, UsersDTO.class);
     }
+
 
     @Test
     void testGetUser_ShouldReturnUserDTO_WhenUserExists() {
-        when(usersRepository.findById(1L)).thenReturn(Optional.of(users));
-        when(modelMapper.map(users, UsersDTO.class)).thenReturn(usersDTO);
+        when(usersRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(modelMapper.map(user1, UsersDTO.class)).thenReturn(user1DTO);
 
-        UsersDTO result = usersService.getUser(1L);
+        UsersDTO result = usersService.getUserById(1L);
 
         assertNotNull(result);
-        assertEquals(usersDTO.getId(), result.getId());
-        assertEquals(usersDTO.getUsername(), result.getUsername());
-        assertEquals(usersDTO.getEmail(), result.getEmail());
+        assertEquals(user1DTO.getId(), result.getId());
+        assertEquals(user1DTO.getUsername(), result.getUsername());
+        assertEquals(user1DTO.getEmail(), result.getEmail());
 
         verify(usersRepository, times(1)).findById(1L);
-        verify(modelMapper, times(1)).map(users, UsersDTO.class);
+        verify(modelMapper, times(1)).map(user1, UsersDTO.class);
     }
 
     @Test
     void testCreateUser_ShouldReturnUserDTO_WhenUserIsCreated() {
-        // Crear el objeto User basado en el UserDTO
-        Users users = new Users();
-        users.setUsername(usersDTO.getUsername());
-        users.setEmail(usersDTO.getEmail());
 
-        // Simular el comportamiento del repositorio para guardar el usuario
-        when(usersRepository.save(any(Users.class))).thenReturn(users);
+        when(usersRepository.save(any(Users.class))).thenReturn(user1);
 
-        // Simular la conversión de UserDTO a User
-        when(modelMapper.map(usersDTO, Users.class)).thenReturn(users);
+        when(modelMapper.map(user1DTO, Users.class)).thenReturn(user1);
 
         // Simular la conversión de User a UserDTO
-        when(modelMapper.map(users, UsersDTO.class)).thenReturn(usersDTO);
+        when(modelMapper.map(user1, UsersDTO.class)).thenReturn(user1DTO);
 
         // Llamar al método que estamos probando
-        UsersDTO result = usersService.createUser(usersDTO);
+        UsersDTO result = usersService.createUser(user1DTO);
 
         // Verificar que el resultado no sea null
         assertNotNull(result);
-        assertEquals(usersDTO.getUsername(), result.getUsername());
-        assertEquals(usersDTO.getEmail(), result.getEmail());
+        assertEquals(user1DTO.getUsername(), result.getUsername());
+        assertEquals(user1DTO.getEmail(), result.getEmail());
 
         // Verificar que el repositorio se haya llamado para guardar el usuario
         verify(usersRepository, times(1)).save(any(Users.class));
-        verify(modelMapper, times(1)).map(usersDTO, Users.class); // Verifica el primer mapeo
-        verify(modelMapper, times(1)).map(users, UsersDTO.class); // Verifica el segundo mapeo
+        verify(modelMapper, times(1)).map(user1DTO, Users.class); // Verifica el primer mapeo
+        verify(modelMapper, times(1)).map(user1, UsersDTO.class); // Verifica el segundo mapeo
     }
 
     @Test
@@ -112,6 +165,7 @@ class UsersServiceTest {
         assertEquals("User Not Found", thrown.getMessage(), "El mensaje de la excepción no es el esperado. Esperábamos 'User Not Found'");
         verify(usersRepository).findById(1L);
     }
+
     @Test
     void testDeleteUser_ShouldThrowException_WhenUserNotFound() {
         // Simulamos que el repositorio no encuentra al usuario

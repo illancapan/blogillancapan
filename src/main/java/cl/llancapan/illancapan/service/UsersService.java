@@ -7,6 +7,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class UsersService {
 
@@ -23,11 +26,12 @@ public class UsersService {
         return modelMapper.map(users, UsersDTO.class);
     }
 
-    public UsersDTO getUser(Long userId) {
-        Users users = usersRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User Not Found"));
+    public List<UsersDTO> getUserAll() {
+        List<Users> userList =  usersRepository.findAll();
 
-        return modelMapper.map(users, UsersDTO.class);
+        return userList.stream()
+                .map(users ->  modelMapper.map(users, UsersDTO.class))
+                .collect(Collectors.toList());
     }
 
     public UsersDTO getUserById(Long userId) {
