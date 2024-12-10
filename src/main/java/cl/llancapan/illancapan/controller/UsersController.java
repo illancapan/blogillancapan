@@ -20,15 +20,23 @@ public class UsersController {
 
     @PostMapping
     public ResponseEntity<UsersDTO> createUser(@RequestBody UsersDTO usersDTO) {
-        UsersDTO createdUser = usersService.createUser(usersDTO);
-
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
-
+        try {
+            UsersDTO createdUser = usersService.createUser(usersDTO);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Manejo de excepciones
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping
-    public ResponseEntity<List<UsersDTO>> getAllUser(){
-        List<UsersDTO> users = usersService.getUserAll();
-        return ResponseEntity.ok(users);
+    public ResponseEntity<List<UsersDTO>> getAllUser() {
+        try {
+            List<UsersDTO> users = usersService.getUserAll();
+            return new ResponseEntity<>(users, HttpStatus.OK); // Devuelve la lista con OK
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Error en la obtención de usuarios
+        }
     }
+
 }

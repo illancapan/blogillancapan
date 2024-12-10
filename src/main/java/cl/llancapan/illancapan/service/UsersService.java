@@ -19,11 +19,11 @@ public class UsersService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public UsersDTO createUser(UsersDTO usersDTO) {
-        Users users = modelMapper.map(usersDTO, Users.class);
-        users = usersRepository.save(users);
 
-        return modelMapper.map(users, UsersDTO.class);
+    public UsersDTO createUser(UsersDTO userDTO) {
+        Users user = modelMapper.map(userDTO, Users.class); // De DTO a entidad
+        Users savedUser = usersRepository.save(user);      // Guardar entidad
+        return modelMapper.map(savedUser, UsersDTO.class); // De entidad a DTO
     }
 
     public List<UsersDTO> getUserAll() {
