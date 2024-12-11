@@ -1,14 +1,18 @@
 package cl.llancapan.illancapan.controller;
 
-import cl.llancapan.illancapan.model.dto.UsersDTO;
+import cl.llancapan.illancapan.model.dto.UserDTO;
 
-import cl.llancapan.illancapan.service.UsersService;
+import cl.llancapan.illancapan.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -24,26 +28,32 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UsersController.class)
-class UsersControllerTest {
+@WebMvcTest(UserController.class)
+class UserControllerTest {
 
     @InjectMocks
-    private UsersController usersController;
+    private UserController usersController;
 
-    @Mock
-    private UsersService usersService;
+    @Autowired
+    private UserService userService;
 
     private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
-    private UsersDTO user1;
-    private UsersDTO user2;
-    private List<UsersDTO> usersList;
+    private UserDTO user1;
+    private UserDTO user2;
+    private List<UserDTO> usersList;
 
     @BeforeEach
     void setUp() {
-        // Arrange
-        user1 = new UsersDTO(
+
+        MockitoAnnotations.openMocks(this);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
+
+        objectMapper = new ObjectMapper();
+
+        user1 = new UserDTO(
                 1L,
                 "github-id-1",
                 "username1",
@@ -53,7 +63,7 @@ class UsersControllerTest {
                 null
         );
 
-        user2 = new UsersDTO(
+        user2 = new UserDTO(
                 2L,
                 "github-id-2",
                 "username2",
@@ -63,34 +73,29 @@ class UsersControllerTest {
                 null
         );
 
-        usersList = Arrays.asList(user1,user2);
-        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
+        usersList = Arrays.asList(user1, user2);
     }
 
     @Test
     void shouldCreateUser() throws Exception {
 
-        // Simulamos la respuesta del servicio
-        when(usersService.createUser(any(UsersDTO.class))).thenReturn(user1);
+        when(userService.createUser(any(UserDTO.class))).thenReturn(user1);
 
-        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
-        // Act & Assert
         mockMvc.perform(post("/user")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(user1)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
-                .andExpect(jsonPath("$.githubId").value("github-id"))
-                .andExpect(jsonPath("$.username").value("username"))
-                .andExpect(jsonPath("$.email").value("email@email.com"))
-                .andExpect(jsonPath("$.avatarUrl").value("avatar-url"));
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.githubId").value("github-id-1"))
+                .andExpect(jsonPath("$.username").value("username1"))
+                .andExpect(jsonPath("$.email").value("email1@email.com"))
+                .andExpect(jsonPath("$.avatarUrl").value("avatar-url-1"));
 
-
-// Usamos assertEquals para verificar si los valores esperados coinciden
-        assertEquals("github-id", user1.getGithubId(), "El githubId debería ser 'github-id'");
-        assertEquals("github", user1.getUsername(), "El username debería ser 'username'");
-        assertEquals("email@email.com", user1.getEmail(), "El email debería ser 'email@email.com'");
-        assertEquals("avatar-url", user1.getAvatarUrl(), "El avatarUrl debería ser 'avatar-url'");
+        assertEquals("github-id-1", user1.getGithubId(), "El githubId debería ser 'github-id-1'");
+        assertEquals("username1", user1.getUsername(), "El username debería ser 'username1'");
+        assertEquals("email1@email.com", user1.getEmail(), "El email debería ser 'email1@email.com'");
+        assertEquals("avatar-url-1", user1.getAvatarUrl(), "El avatarUrl debería ser 'avatar-url-1'");
 
 
     }
@@ -98,9 +103,7 @@ class UsersControllerTest {
     @Test
     void shouldGetAllUsers() throws Exception {
 
-        when(usersService.getUserAll()).thenReturn(usersList);
-
-        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
+        when(userService.getUserAll()).thenReturn(usersList);
 
         mockMvc.perform(get("/user/all")
                         .contentType("application/json"))
@@ -118,23 +121,20 @@ class UsersControllerTest {
                 .andExpect(jsonPath("$[1].avatarUrl").value("avatar-url-2"));
     }
 
-//    @Test
-//    void shouldGetUserById() throws Exception {
-//
-//        when(usersService.getUserById(any(usersList))).thenReturn(usersList);
-//
-//        mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
-//
-//        mockMvc.perform(get("/user/{id}", userId)
-//                        .contentType("application/json"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().contentType("application/json"))
-//                .andExpect(jsonPath("$.id").value(userId))
-//                .andExpect(jsonPath("$.githubId").value("github-id"))
-//                .andExpect(jsonPath("$.username").value("username"))
-//                .andExpect(jsonPath("$.email").value("email@email.com"))
-//                .andExpect(jsonPath("$.avatarUrl").value("avatar-url"));
-//
-//    }
+    @Test
+    void shouldGetByIdUser() throws Exception {
 
+        when(userService.getUserById(1L)).thenReturn(user1);
+
+        mockMvc.perform(get("/user/1")
+                        .contentType("application/json"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.githubId").value("github-id-1"))
+                .andExpect(jsonPath("$.username").value("username1"))
+                .andExpect(jsonPath("$.email").value("email1@email.com"))
+                .andExpect(jsonPath("$.avatarUrl").value("avatar-url-1"));
+
+    }
 }

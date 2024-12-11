@@ -1,8 +1,8 @@
 package cl.llancapan.illancapan.controller;
 
 
-import cl.llancapan.illancapan.model.dto.UsersDTO;
-import cl.llancapan.illancapan.service.UsersService;
+import cl.llancapan.illancapan.model.dto.UserDTO;
+import cl.llancapan.illancapan.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,15 +13,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/user")
-public class UsersController {
+public class UserController {
 
     @Autowired
-    private UsersService usersService;
+    private UserService userService;
 
     @PostMapping
-    public ResponseEntity<UsersDTO> createUser(@RequestBody UsersDTO usersDTO) {
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         try {
-            UsersDTO createdUser = usersService.createUser(usersDTO);
+            UserDTO createdUser = userService.createUser(userDTO);
             return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
         } catch (Exception e) {
             // Manejo de excepciones
@@ -30,13 +30,18 @@ public class UsersController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UsersDTO>> getAllUser() {
+    public ResponseEntity<List<UserDTO>> getAllUser() {
         try {
-            List<UsersDTO> users = usersService.getUserAll();
+            List<UserDTO> users = userService.getUserAll();
             return new ResponseEntity<>(users, HttpStatus.OK); // Devuelve la lista con OK
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Error en la obtención de usuarios
         }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
+        return ResponseEntity.ok((userService.getUserById(id)));
     }
 
 }

@@ -1,8 +1,8 @@
 package cl.llancapan.illancapan.service;
 
-import cl.llancapan.illancapan.model.dto.UsersDTO;
+import cl.llancapan.illancapan.model.dto.UserDTO;
 import cl.llancapan.illancapan.model.entity.Users;
-import cl.llancapan.illancapan.repository.UsersRepository;
+import cl.llancapan.illancapan.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,21 +21,21 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class UsersServiceTest {
+class UserServiceTest {
 
     @Mock
-    private UsersRepository usersRepository;
+    private UserRepository userRepository;
 
     @Mock
     private ModelMapper modelMapper;
 
     @InjectMocks
-    private UsersService usersService;
+    private UserService userService;
 
     private Users user1;
     private Users user2;
-    private UsersDTO user1DTO;
-    private UsersDTO user2DTO;
+    private UserDTO user1DTO;
+    private UserDTO user2DTO;
 
     @BeforeEach
     void setUp() {
@@ -59,7 +59,7 @@ class UsersServiceTest {
                 LocalDateTime.now(),
                 LocalDateTime.now());
 
-        user1DTO = new UsersDTO(
+        user1DTO = new UserDTO(
                 1L,
                 "github-id-1",
                 "username1",
@@ -68,7 +68,7 @@ class UsersServiceTest {
                 LocalDateTime.now(),
                 LocalDateTime.now());
 
-        user2DTO = new UsersDTO(
+        user2DTO = new UserDTO(
                 2L,
                 "github-id-2",
                 "username2",
@@ -80,11 +80,11 @@ class UsersServiceTest {
 
     @Test
     void testGetAllUser_shouldGetAllUsers() {
-        when(usersRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
-        when(modelMapper.map(any(Users.class), eq(UsersDTO.class)))
+        when(userRepository.findAll()).thenReturn(Arrays.asList(user1, user2));
+        when(modelMapper.map(any(Users.class), eq(UserDTO.class)))
                 .thenAnswer(invocation -> {
                     Users user = invocation.getArgument(0);
-                    return new UsersDTO(
+                    return new UserDTO(
                             user.getId(),
                             user.getGithubId(),
                             user.getUsername(),
@@ -94,12 +94,12 @@ class UsersServiceTest {
                             user.getUpdatedAt());
                 });
 
-        List<UsersDTO> result = usersService.getUserAll();
+        List<UserDTO> result = userService.getUserAll();
 
         assertNotNull(result);
         assertEquals(2, result.size());
-        verify(usersRepository, times(1)).findAll();
-        verify(modelMapper, times(2)).map(any(Users.class), eq(UsersDTO.class));
+        verify(userRepository, times(1)).findAll();
+        verify(modelMapper, times(2)).map(any(Users.class), eq(UserDTO.class));
     }
 
     @Test
@@ -112,7 +112,7 @@ class UsersServiceTest {
                 "test-avatar",
                 LocalDateTime.now(),
                 LocalDateTime.now());
-        UsersDTO expectedDTO = new UsersDTO(
+        UserDTO expectedDTO = new UserDTO(
                 1L,
                 "test-github-id",
                 "test-username",
@@ -121,69 +121,69 @@ class UsersServiceTest {
                 LocalDateTime.now(),
                 LocalDateTime.now());
 
-        when(usersRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(modelMapper.map(testUser, UsersDTO.class)).thenReturn(expectedDTO);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(modelMapper.map(testUser, UserDTO.class)).thenReturn(expectedDTO);
 
-        UsersDTO result = usersService.getUserById(1L);
+        UserDTO result = userService.getUserById(1L);
 
         assertNotNull(result);
         assertEquals(expectedDTO.getId(), result.getId());
         assertEquals(expectedDTO.getUsername(), result.getUsername());
         assertEquals(expectedDTO.getEmail(), result.getEmail());
 
-        verify(usersRepository, times(1)).findById(1L);
-        verify(modelMapper, times(1)).map(testUser, UsersDTO.class);
+        verify(userRepository, times(1)).findById(1L);
+        verify(modelMapper, times(1)).map(testUser, UserDTO.class);
     }
 
 
     @Test
     void testCreateUser_ShouldReturnUserDTO_WhenUserIsCreated() {
         when(modelMapper.map(user1DTO, Users.class)).thenReturn(user1);
-        when(usersRepository.save(user1)).thenReturn(user1);
-        when(modelMapper.map(user1, UsersDTO.class)).thenReturn(user1DTO);
+        when(userRepository.save(user1)).thenReturn(user1);
+        when(modelMapper.map(user1, UserDTO.class)).thenReturn(user1DTO);
 
-        UsersDTO result = usersService.createUser(user1DTO);
+        UserDTO result = userService.createUser(user1DTO);
 
         assertNotNull(result, "El resultado no debe ser nulo.");
         assertEquals(user1DTO.getUsername(), result.getUsername());
         assertEquals(user1DTO.getEmail(), result.getEmail());
 
-        verify(usersRepository, times(1)).save(user1);
+        verify(userRepository, times(1)).save(user1);
         verify(modelMapper, times(1)).map(user1DTO, Users.class);
-        verify(modelMapper, times(1)).map(user1, UsersDTO.class);
+        verify(modelMapper, times(1)).map(user1, UserDTO.class);
     }
 
 
     @Test
     void testGetUserById_ShouldThrowException_WhenUserNotFound() {
-        when(usersRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         RuntimeException thrown = assertThrows(RuntimeException.class,
-                () -> usersService.getUserById(1L),
+                () -> userService.getUserById(1L),
                 "Se esperaba que se lanzara una excepción RuntimeException cuando el usuario no existe");
 
         assertEquals("User Not Found", thrown.getMessage(), "El mensaje de la excepción no es el esperado.");
-        verify(usersRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void testDeleteUser_ShouldThrowException_WhenUserNotFound() {
-        when(usersRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
         RuntimeException thrown = assertThrows(RuntimeException.class,
-                () -> usersService.deleteUser(1L),
+                () -> userService.deleteUser(1L),
                 "Se esperaba que se lanzara una excepción RuntimeException cuando el usuario no es encontrado");
 
         assertEquals("User Not Found", thrown.getMessage(), "El mensaje de la excepción no es el esperado.");
-        verify(usersRepository, times(1)).findById(1L);
+        verify(userRepository, times(1)).findById(1L);
     }
 
     @Test
     void testDeleteUser_ShouldDeleteUser_WhenUserExists() {
-        when(usersRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
 
-        usersService.deleteUser(1L);
+        userService.deleteUser(1L);
 
-        verify(usersRepository, times(1)).delete(user1);
+        verify(userRepository, times(1)).delete(user1);
     }
 }

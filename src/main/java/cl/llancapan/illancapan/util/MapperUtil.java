@@ -1,39 +1,39 @@
 package cl.llancapan.illancapan.util;
 
-import cl.llancapan.illancapan.model.dto.UsersDTO;
+import cl.llancapan.illancapan.model.dto.UserDTO;
 import cl.llancapan.illancapan.model.entity.Users;
 
 public class MapperUtil {
 
-    public static UsersDTO toUserDTO(Users users) {
+    public static UserDTO toUserDTO(Users users) {
         if (users == null) {
             return null;
         }
 
-        UsersDTO usersDTO = new UsersDTO();
-        usersDTO.setId(users.getId());
-        usersDTO.setGithubId(users.getGithubId());
-        usersDTO.setEmail(users.getEmail());
-        usersDTO.setUsername(users.getUsername());
-        usersDTO.setAvatarUrl(users.getAvatarUrl());
-        usersDTO.setCreatedAt(users.getCreatedAt());
-        usersDTO.setUpdatedAt(users.getUpdatedAt());
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(users.getId());
+        userDTO.setGithubId(users.getGithubId());
+        userDTO.setEmail(users.getEmail());
+        userDTO.setUsername(users.getUsername());
+        userDTO.setAvatarUrl(users.getAvatarUrl());
+        userDTO.setCreatedAt(users.getCreatedAt());
+        userDTO.setUpdatedAt(users.getUpdatedAt());
 
-        return usersDTO;
+        return userDTO;
     }
-    public static Users toUser(UsersDTO usersDTO) {
-        if (usersDTO == null) {
+    public static Users toUser(UserDTO userDTO) {
+        if (userDTO == null) {
             return null;
         }
 
         Users users = new Users();
-        users.setId(usersDTO.getId());
-        users.setGithubId(usersDTO.getGithubId());
-        users.setEmail(usersDTO.getEmail());
-        users.setUsername(usersDTO.getUsername());
-        users.setAvatarUrl(usersDTO.getAvatarUrl());
-        users.setCreatedAt(usersDTO.getCreatedAt());
-        users.setUpdatedAt(usersDTO.getUpdatedAt());
+        users.setId(userDTO.getId());
+        users.setGithubId(userDTO.getGithubId());
+        users.setEmail(userDTO.getEmail());
+        users.setUsername(userDTO.getUsername());
+        users.setAvatarUrl(userDTO.getAvatarUrl());
+        users.setCreatedAt(userDTO.getCreatedAt());
+        users.setUpdatedAt(userDTO.getUpdatedAt());
 
         return users;
     }

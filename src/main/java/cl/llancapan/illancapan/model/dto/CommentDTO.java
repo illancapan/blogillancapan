@@ -16,7 +16,7 @@ public class CommentDTO {
     private Long id;
 
     private String content;
-    private UsersDTO author;
+    private UserDTO author;
     private PostDTO post;
     private LocalDateTime createdAt = LocalDateTime.now();
 }
